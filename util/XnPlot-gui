@@ -1,0 +1,83 @@
+##!/usr/bin/env python
+## -*- coding: iso8859-15 -*-
+
+from tkinter import *
+from tkinter import ttk
+
+def calculate(*args):
+    try:
+        value = float(feet.get())
+        meters.set((0.3048 * value * 10000.0 + 0.5)/10000.0)
+    except ValueError:
+        pass
+
+root = Tk()
+root.title("Feet to Meters")
+
+mainframe = ttk.Frame(root, padding="3 3 12 12")
+mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
+mainframe.columnconfigure(0, weight=1)
+mainframe.rowconfigure(0, weight=1)
+
+feet = StringVar()
+meters = StringVar()
+
+feet_entry = ttk.Entry(mainframe, width=7, textvariable=feet)
+feet_entry.grid(column=2, row=1, sticky=(W, E))
+
+ttk.Label(mainframe, textvariable=meters).grid(column=2, row=2, sticky=(W, E))
+ttk.Button(mainframe, text="Calculate", command=calculate).grid(column=3, row=3, sticky=W)
+
+ttk.Label(mainframe, text="feet").grid(column=3, row=1, sticky=W)
+ttk.Label(mainframe, text="is equivalent to").grid(column=1, row=2, sticky=E)
+ttk.Label(mainframe, text="meters").grid(column=3, row=2, sticky=W)
+
+for child in mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
+
+feet_entry.focus()
+root.bind('<Return>', calculate)
+
+root.mainloop()
+
+#from Tkinter import *
+
+#yesno=["yes","no"]
+#FileGRD=""
+#isICC=""
+#isSOL=""
+
+#class XnPlotGUI:
+#  def __init__(self, master):
+#    mainFrame = Frame(master)
+#    mainFrame.pack()
+#    # GRD file
+#    labelGRD = Label(mainFrame, text="GRD file")
+#    labelGRD.grid(row=0, column=0)
+#    self.tentryGRD = Entry(mainFrame, textvariable=FileGRD, width=100)
+#    self.tentryGRD.grid(row=0, column=1)
+#    self.buttGRDf = Button(mainFrame)
+#    self.buttGRDf["borderwidth"] = 1
+#    self.buttGRDf["text"] = "Browse for File GRD"
+#    self.buttGRDf["command"] = master.quit
+#    self.buttGRDf.grid(row=0, column=2)
+#    # ICC file
+#    labelICC = Label(mainFrame, text="ICC file")
+#    labelICC.grid(row=1, column=0)
+#    for i,val in enumerate(yesno):
+#      self.rdbICC = Radiobutton(mainFrame, text=val, variable=isICC, value=val)
+#      self.rdbICC.grid(row=1, column=i+1)
+#    # SOL file
+#    labelSOL = Label(mainFrame, text="SOL file")
+#    labelSOL.grid(row=2, column=0)
+#    for i,val in enumerate(yesno):
+#      self.rdbSOL = Radiobutton(mainFrame, text=val, variable=isSOL, value=val)
+#      self.rdbSOL.grid(row=2, column=i+1)
+
+#root = Tk()
+#root.title("XnPlot GUI")
+
+#app = XnPlotGUI(root)
+
+#root.mainloop()
+
+
