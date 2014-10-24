@@ -32,6 +32,17 @@ Go to [Top](#top) or [Toc](#toc)
 + any feature request is welcome!
 
 Go to [Top](#top) or [Toc](#toc)
+## <a name="download"></a>Download XnPlot
+If you use `git` it could be convenient to clone this repository:
+```bash
+git clone https://github.com/szaghi/XnPlot
+```
+Other 2 possibilities are:
+
+1. use the GitHub **Download ZIP** button on the right sidebar of this page;
+2. download one of the releases in the [release page](https://github.com/szaghi/XnPlot/releases), also listed at the end of this page.
+
+Go to [Top](#top) or [Toc](#toc) 
 ## <a name="requirements"></a>Requirements
 + Modern Fortran Compiler (standard 2003+);
 + a lot of patience with the author.
@@ -94,16 +105,8 @@ For example compiling in debug mode with the Intel Fortran compiler you can type
 ```bash
 make DEBUG=yes COMPILER=intel
 ```
-## <a name="download"></a>Download XnPlot
-If you use `git` it could be convenient to clone this repository:
-```bash
-git clone https://github.com/szaghi/XnPlot
-```
-Other 2 possibilities are:
 
-1. use the GitHub **Download ZIP** button on the right sidebar of this page;
-2. download one of the releases in the [release page](https://github.com/szaghi/XnPlot/releases), also listed at the end of this page.
-
+Go to [Top](#top) or [Toc](#toc)
 ## <a name="usage"></a>Usage
 ### <a name="usage-help">Main Help
 XnPlot is is a Command Line Tool. To list the available options run it as following:
