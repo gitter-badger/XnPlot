@@ -21,8 +21,12 @@
 !> Module definition of Type_Command_Line_Interface
 !> @}
 
-!> @brief This module contains the definition of Type_Command_Line_Interface and its procedures.
+!> @brief FLAP is A very simple and stupid tool for building easily nice Command Line Interface for modern Fortran projects.
 !> Type_Command_Line_Interface (CLI) is a derived type implementing a flexible Command Line Interface (CLI).
+!> @author    Stefano Zaghi
+!> @version   0.0.1
+!> @date      2014-10-22
+!> @copyright GNU Public License version 3.
 module Data_Type_Command_Line_Interface
 !-----------------------------------------------------------------------------------------------------------------------------------
 USE IR_Precision ! Integers and reals precision definition.
@@ -757,6 +761,7 @@ contains
   cli%progname = 'program'                                                     ; if (present(progname)) cli%progname = progname
   cli%version  = 'unknown'                                                     ; if (present(version )) cli%version  = version
   cli%help     = ' The Command Line Interface (CLI) has the following options' ; if (present(help    )) cli%help     = help
+  if (present(disable_hv)) cli%disable_hv = .true.
   if (present(examples)) then
     allocate(character(len=len(examples(1))):: cli%examples(1:size(examples)))
     cli%examples = examples

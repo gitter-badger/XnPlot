@@ -1,3 +1,7 @@
+[![Ready in backlog](https://badge.waffle.io/szaghi/xnplot.png?label=ready&title=Ready)](https://waffle.io/szaghi/xnplot)
+[![In Progress](https://badge.waffle.io/szaghi/xnplot.png?label=in%20progress&title=In%20Progress)](https://waffle.io/szaghi/xnplot)
+[![Open bugs](https://badge.waffle.io/szaghi/xnplot.png?label=bug&title=Open%20Bugs)](https://waffle.io/szaghi/xnplot)
+
 # XnPlot
 ### <a name="top">Xnavis PostProcessor
 XnPlot loads Xnavis mesh and solution files and produces post-processed plot files.
@@ -28,7 +32,7 @@ XnPlot loads Xnavis mesh and solution files and produces post-processed plot fil
 
 Go to [Top](#top) or [Toc](#toc)
 ## <a name="todos"></a>Todos
-+ ...
++ Refactor utilities;
 + any feature request is welcome!
 
 Go to [Top](#top) or [Toc](#toc)
