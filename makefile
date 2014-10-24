@@ -15,7 +15,7 @@ DEBUG    = no
 F03STD   = no
 OPTIMIZE = no
 OPENMP   = no
-BIGEIN   = yes
+BIGEIN   = no
 R16P     = no
 DEXE     = ~/bin/
 
@@ -115,7 +115,7 @@ ifeq "$(COMPILER)" "gnu"
 endif
 ifeq "$(COMPILER)" "intel"
   FC = ifort
-  OPTSC = -cpp -c -module $(DMOD) -static -assume protect_parens -assume norealloc_lhs -fp-model source -gen-dep=depend
+  OPTSC = -cpp -c -module $(DMOD) -static#-assume protect_parens -assume norealloc_lhs -fp-model source -gen-dep=depend
   OPTSL =
   WRN = $(WRN_INT)
   CHK = $(CHK_INT)
@@ -243,8 +243,29 @@ $(DEXE)XnPlot : PRINTINFO $(MKDIRS) $(DOBJ)xnplot.o
 	@$(FC) $(OPTSL) $(DOBJ)*.o $(LIBS) -o $@ 1>> diagnostic_messages 2>> error_messages
 EXES := $(EXES) XnPlot
 
+$(DOBJ)block_variables.o: src/Block_Variables.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_postprocess.o \
+	$(DOBJ)data_type_vector.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_command_line_interface.o: src/Data_Type_Command_Line_Interface.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
 $(DOBJ)data_type_os.o : Data_Type_OS.f90 \
 	$(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)data_type_postprocess.o: src/Data_Type_PostProcess.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)data_type_command_line_interface.o \
+	$(DOBJ)data_type_os.o \
+	$(DOBJ)lib_io_misc.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
@@ -274,6 +295,29 @@ $(DOBJ)lib_io_misc.o : Lib_IO_Misc.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
+$(DOBJ)lib_metrics.o: src/Lib_Metrics.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)block_variables.o \
+	$(DOBJ)data_type_vector.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_tec.o: src/Lib_TEC.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)block_variables.o \
+	$(DOBJ)data_type_postprocess.o \
+	$(DOBJ)data_type_vector.o \
+	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_vorticity.o: src/Lib_Vorticity.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)block_variables.o \
+	$(DOBJ)data_type_vector.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
 $(DOBJ)lib_vtk_io.o : Lib_VTK_IO.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)lib_base64.o
@@ -282,10 +326,12 @@ $(DOBJ)lib_vtk_io.o : Lib_VTK_IO.f90 \
 
 $(DOBJ)xnplot.o : XnPlot.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)data_type_tensor.o \
-	$(DOBJ)data_type_vector.o \
-	$(DOBJ)data_type_os.o \
-	$(DOBJ)lib_io_misc.o \
+	$(DOBJ)block_variables.o \
+	$(DOBJ)data_type_command_line_interface.o \
+	$(DOBJ)data_type_postprocess.o \
+	$(DOBJ)lib_metrics.o \
+	$(DOBJ)lib_tec.o \
+	$(DOBJ)lib_vorticity.o \
 	$(DOBJ)lib_vtk_io.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages

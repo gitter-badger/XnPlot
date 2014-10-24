@@ -6,12 +6,17 @@ XnPlot loads Xnavis mesh and solution files and produces post-processed plot fil
 ## <a name="toc">Table of Contents
 
 * [Team Members](#team-members)
-* [What is FLAP?](#what)
+* [What is XnPlot?](#what)
 * [Todos](#todos)
 * [Requirements](#requirements)
 * [Copyrights](#copyrights)
+* [Download XnPlot](#download)
 * [Compiling Instructions](#compile)
 * [Usage](#usage)
+  + [Main Help](#usage-help)
+  + [Post-processing only mesh files](#usage-only-mesh)
+  + [Post-processing mesh and solutions files](#usage-mesh-sol)
+* [Version History](#versions)
 
 ## <a name="team-members"></a>Team Members
 * Stefano Zaghi <stefano.zaghi@gmail.com>
@@ -92,8 +97,19 @@ For example compiling in debug mode with the Intel Fortran compiler you can type
 ```bash
 make DEBUG=yes COMPILER=intel
 ```
+## <a name="download"></a>Download XnPlot
+If you use `git` it could be convenient to clone this repository:
+```bash
+git clone https://github.com/szaghi/XnPlot
+```
+Other 2 possibilities are:
+
+1. use the GitHub **Download ZIP** button on the right sidebar of this page;
+2. download one of the releases in the [release page](https://github.com/szaghi/XnPlot/releases), also listed at the end of this page.
+
 ## <a name="usage"></a>Usage
-### Basic Usage
+
+### <a name="usage-help">Main Help
 XnPlot is is a Command Line Tool. To list the available options run it without arguments:
 
 ```bash
@@ -152,7 +168,7 @@ XnPlot
       if blanking is used the blanking mode must be "any corners" or "primary values".
 ```
 
-### Post-processing only mesh files
+### <a name="usage-only-mesh">Post-processing only mesh files
 
 #### GRD files (no ghost cells)
 ```bash
@@ -164,7 +180,7 @@ A file named `mesh.plt` is generated.
   XnPlot -g cc.01.grd -i cc.01 -o mesh.01
 ```
 A file named `mesh.01.plt` is generated. 
-### Post-processing mesh and solutuions files
+### <a name="usage-mesh-sol">Post-processing mesh and solutions files
 ```bash
   XnPlot -g cc.01.grd -i cc.01 -s sol.00.01 -o sol.01
 ```
@@ -174,3 +190,12 @@ A file named `sol.01.plt` is generated.
 To be written.
 
 Go to [Top](#top) or [Toc](#toc)
+
+## <a name="versions"></a>Version History
+In the following the changelog of most important releases is reported.
+### v0.0.2 
+##### Download [ZIP](https://github.com/szaghi/XnPlot/archive/v0.0.2.zip) ball or [TAR](https://github.com/szaghi/XnPlot/archive/v0.0.2.tar.gz) one
+XnPlot.f90 module split for improve compiling speed. Fully backward compatible.
+### v0.0.1 
+##### Download [ZIP](https://github.com/szaghi/XnPlot/archive/v0.0.1.zip) ball or [TAR](https://github.com/szaghi/XnPlot/archive/v0.0.1.tar.gz) one
+Stable Release. Fully backward compatible.
