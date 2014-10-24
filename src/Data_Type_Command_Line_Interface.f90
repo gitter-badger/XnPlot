@@ -35,11 +35,13 @@ private
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
-integer(I4P),     parameter:: max_val_len        = 1000          !< Maximum number of characters of CLA value.
-character(len=*), parameter:: action_store       = 'STORE'       !< CLA that stores a value associated to its switch.
-character(len=*), parameter:: action_store_true  = 'STORE_TRUE'  !< CLA that stores .true. without the necessity of a value.
-character(len=*), parameter:: action_store_false = 'STORE_FALSE' !< CLA that stores .false. without the necessity of a value.
-character(len=*), parameter:: args_sep           = '||!||'       !< Arguments separator for multiple valued (list) CLA.
+integer(I4P),     parameter:: max_val_len        = 1000            !< Maximum number of characters of CLA value.
+character(len=*), parameter:: action_store       = 'STORE'         !< CLA that stores a value associated to its switch.
+character(len=*), parameter:: action_store_true  = 'STORE_TRUE'    !< CLA that stores .true. without the necessity of a value.
+character(len=*), parameter:: action_store_false = 'STORE_FALSE'   !< CLA that stores .false. without the necessity of a value.
+character(len=*), parameter:: action_print_help  = 'PRINT_HELP'    !< CLA that print help message.
+character(len=*), parameter:: action_print_vers  = 'PRINT_VERSION' !< CLA that print version.
+character(len=*), parameter:: args_sep           = '||!||'         !< Arguments separator for multiple valued (list) CLA.
 !> Derived type containing the useful data for handling command line arguments (CLA).
 !> @note If not otherwise declared the action on CLA value is set to "store" a value.
 !> @ingroup Data_Type_Command_Line_InterfaceDerivedType
@@ -79,8 +81,10 @@ type, public:: Type_Command_Line_Interface
   integer(I4P)::                                  Na_optional = 0_I4P !< Number of command line arguments that are optional for CLI.
   type(Type_Command_Line_Argument), allocatable:: cla(:)              !< CLA list [1:Na].
   character(len=:), allocatable::                 progname            !< Program name.
+  character(len=:), allocatable::                 version             !< Program version.
   character(len=:), allocatable::                 help                !< Help message introducing the CLI usage.
   character(len=:), allocatable::                 examples(:)         !< Examples of correct usage.
+  logical::                                       disable_hv = .false.!< Disable automatic inserting of 'help' and 'version' CLAs.
   contains
     procedure:: free                                ! Procedure for freeing dynamic memory.
     procedure:: init                                ! Procedure for initializing CLI.
@@ -616,8 +620,12 @@ contains
   if (cla%required) then
     write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//'     It is a non optional CLA thus must be passed to CLI'
   else
-    write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//'     It is a optional CLA which default value is "'//&
-                                                                 trim(adjustl(cla%def))//'"'
+    if (cla%def /= '') then
+      write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//'     It is a optional CLA which default value is "'//&
+                                                                   trim(adjustl(cla%def))//'"'
+    else
+      write(unit=unit,fmt='(A)',iostat=iostatd,iomsg=iomsgd)prefd//'     It is a optional CLA'
+    endif
   endif
   if (present(iostat)) iostat = iostatd
   if (present(iomsg))  iomsg  = iomsgd
@@ -734,17 +742,20 @@ contains
   endsubroutine finalize
 
   !> @brief Procedure for initializing CLI.
-  pure subroutine init(cli,progname,help,examples)
+  pure subroutine init(cli,progname,version,help,examples,disable_hv)
   !---------------------------------------------------------------------------------------------------------------------------------
   implicit none
   class(Type_Command_Line_Interface), intent(INOUT):: cli          !< CLI data.
   character(*), optional,             intent(IN)::    progname     !< Program name.
+  character(*), optional,             intent(IN)::    version      !< Program version.
   character(*), optional,             intent(IN)::    help         !< Help message introducing the CLI usage.
   character(*), optional,             intent(IN)::    examples(1:) !< Examples of correct usage.
+  logical,      optional,             intent(IN)::    disable_hv   !< Disable automatic inserting of 'help' and 'version' CLAs.
   !---------------------------------------------------------------------------------------------------------------------------------
 
   !---------------------------------------------------------------------------------------------------------------------------------
   cli%progname = 'program'                                                     ; if (present(progname)) cli%progname = progname
+  cli%version  = 'unknown'                                                     ; if (present(version )) cli%version  = version
   cli%help     = ' The Command Line Interface (CLI) has the following options' ; if (present(help    )) cli%help     = help
   if (present(examples)) then
     allocate(character(len=len(examples(1))):: cli%examples(1:size(examples)))
@@ -908,6 +919,25 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   error = 0
   prefd = '' ; if (present(pref)) prefd = pref
+  if (.not.cli%disable_hv) then
+    ! adding help and version switches if not initialized from user
+    found = .false.
+    do aa=1,cli%Na
+      if (.not.cli%cla(aa)%positional) then
+        if (cli%cla(aa)%switch=='--help'.and.cli%cla(aa)%switch_ab=='-h') found = .true.
+      endif
+    enddo
+    if (.not.found) call cli%add(pref=prefd,switch='--help',switch_ab='-h',help='Print this help message',&
+                                 required=.false.,def='',act='print_help',error=error)
+    found = .false.
+    do aa=1,cli%Na
+      if (.not.cli%cla(aa)%positional) then
+        if (cli%cla(aa)%switch=='--version'.and.cli%cla(aa)%switch_ab=='-v') found = .true.
+      endif
+    enddo
+    if (.not.found) call cli%add(pref=prefd,switch='--version',switch_ab='-v',help='Print version',&
+                                 required=.false.,def='',act='print_version',error=error)
+  endif
   ! counting the passed CLA
   Na = command_argument_count()
   if (Na<cli%Na_required) then
@@ -954,6 +984,14 @@ contains
                 call get_command_argument(a,val)
                 cli%cla(aa)%val = trim(adjustl(val))
               endif
+            elseif (cli%cla(aa)%act==action_print_help) then
+              call print_usage
+              error = -1
+              return
+            elseif (cli%cla(aa)%act==action_print_vers) then
+              call print_version
+              error = -2
+              return
             endif
             cli%cla(aa)%passed = .true.
             found = .true.
@@ -1020,6 +1058,18 @@ contains
     return
     !-------------------------------------------------------------------------------------------------------------------------------
     endsubroutine print_usage
+
+    !> @brief Procedure for printing the correct use Command Line Interface accordingly to the cli%cla passed.
+    subroutine print_version
+    !-------------------------------------------------------------------------------------------------------------------------------
+    character(len=:), allocatable:: cla_list_sign !< Complete signature of CLA list.
+    !-------------------------------------------------------------------------------------------------------------------------------
+
+    !-------------------------------------------------------------------------------------------------------------------------------
+    write(stdout,'(A)')prefd//' '//cli%progname//' version '//cli%version
+    return
+    !-------------------------------------------------------------------------------------------------------------------------------
+    endsubroutine print_version
   endsubroutine parse
 
   !> @brief Procedure for getting CLA (single) value from CLAs list parsed.

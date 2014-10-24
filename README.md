@@ -1,6 +1,5 @@
 # XnPlot
 ### <a name="top">Xnavis PostProcessor
-
 XnPlot loads Xnavis mesh and solution files and produces post-processed plot files.
 
 ## <a name="toc">Table of Contents
@@ -16,15 +15,16 @@ XnPlot loads Xnavis mesh and solution files and produces post-processed plot fil
   + [Main Help](#usage-help)
   + [Post-processing only mesh files](#usage-only-mesh)
   + [Post-processing mesh and solutions files](#usage-mesh-sol)
+  + [Utilities](#utilities)
 * [Version History](#versions)
 
 ## <a name="team-members"></a>Team Members
-* Stefano Zaghi <stefano.zaghi@gmail.com>
+* Stefano Zaghi    <stefano.zaghi@gmail.com>
+* Riccardo Broglia
 
 Go to [Top](#top) or [Toc](#toc)
 ## <a name="what"></a>What is XnPlot?
-
-XnPlot loads Xnavis mesh and solution files and produces post-processed plot files.
+XnPlot loads Xnavis mesh and solution files and produces post-processed plot files. It is one the many post-processors of Xnavis code.
 
 Go to [Top](#top) or [Toc](#toc)
 ## <a name="todos"></a>Todos
@@ -40,9 +40,7 @@ XnPlot is developed on a GNU/Linux architecture. For Windows architecture there 
 
 Go to [Top](#top) or [Toc](#toc)
 ## <a name="Copyrights"></a>Copyrights
-
 XnPlot is an open source project, it is distributed under the [GPL v3](http://www.gnu.org/licenses/gpl-3.0.html). Anyone is interest to use, to develop or to contribute to XnPlot is welcome.
-
 
 Go to [Top](#top) or [Toc](#toc)
 ## <a name="compile"></a>Compiling Instructions
@@ -70,7 +68,7 @@ The provided makefile has several options. It has one rule that prints all optio
   F03STD=yes(no)   => on(off) check standard fortran (default no)
   OPTIMIZE=yes(no) => on(off) optimization           (default no)
   OPENMP=yes(no)   => on(off) OpenMP directives      (default no)
-  BIGEIN=yes(no)   => on(off) Big Endian input files (default yes)
+  BIGEIN=yes(no)   => on(off) Big Endian input files (default no)
 
  Preprocessing options
   R16P=yes(no) => on(off) definition of real with "128 bit" (default no)
@@ -82,9 +80,8 @@ The provided makefile has several options. It has one rule that prints all optio
   TECIO=yes(no) => on(off) Tecplot IO library linking (default )
 
  Provided Rules
-  Defualt rule     => ~/bin/XnPatches
-  help             => printing this help message
-  ~/bin/XnPatches => building OFF code
+  Defualt rule => ~/bin/XnPlot
+  help         => printing this help message
   cleanobj     => cleaning compiled object
   cleanmod     => cleaning .mod files
   cleanmsg     => cleaning make-log massage files
@@ -108,68 +105,78 @@ Other 2 possibilities are:
 2. download one of the releases in the [release page](https://github.com/szaghi/XnPlot/releases), also listed at the end of this page.
 
 ## <a name="usage"></a>Usage
-
 ### <a name="usage-help">Main Help
-XnPlot is is a Command Line Tool. To list the available options run it without arguments:
-
+XnPlot is is a Command Line Tool. To list the available options run it as following:
 ```bash
-./XnPlot
+./XnPlot -h
 ```
 this help will echoed
 ```bash
-XnPlot
- Post processing code for Xnavis code
- Usage:
-   XnPlot -g file_grd
-         [-o file_output
-          -i file_icc
-          -s file_solution
-          -ngc
-          -cell
-          -ls
-          -eq #turbulent_eq_model (0,1,2)                                                                                                                                                                                                                             
-          -vordet                                                                                                                                                                                                                                                     
-          -ascii                                                                                                                                                                                                                                                      
-          -tec yes/no                                                                                                                                                                                                                                                 
-          -vtk yes/no                                                                                                                                                                                                                                                 
-          -proc #proc                                                                                                                                                                                                                                                 
-          -os UIX/WIN]                                                                                                                                                                                                                                                
-                                                                                                                                                                                                                                                                      
- Optional arguments and default values:                                                                                                                                                                                                                               
-  -o file_output   => output file name; default is basename of grd file with the proper extension                                                                                                                                                                     
-  -i file_icc      => icc file name; if passed the icc variable is saved at cell centers                                                                                                                                                                              
-  -s file_solution => solution file name; if passed the solution variables are saved                                                                                                                                                                                  
-  -ngc             => mesh without ghosts cells, as geogrd output (default no, grd with ghosts cells)                                                                                                                                                                 
-  -cell            => all variables other than nodes coord. are cell centered (default no, node centered)                                                                                                                                                             
-  -ls              => solution with level set                                                                                                                                                                                                                         
-  -nt              => no turbulent model, laminar flow                                                                                                                                                                                                                
-  -eq #0/1/2       => # equations turbulent model (default 1)                                                                                                                                                                                                         
-  -vordet          => computing "vordet" variable for vortices identification (default no)                                                                                                                                                                            
-  -ascii           => write ascii output file (default no, write binary one)                                                                                                                                                                                          
-  -tec yes/no      => write (or not) Tecplot file format (default yes)                                                                                                                                                                                                
-  -vtk yes/no      => write (or not) VTK file format (default no)                                                                                                                                                                                                     
-  -proc #proc      => if file "proc.input" if found global blocks numeration is used; #proc is the process                                                                                                                                                            
-                      number of the current processed file                                                                                                                                                                                                            
-  -os UIX/WIN      => type of Operating System write (default *UIX OS type)                                                                                                                                                                                           
-                                                                                                                                                                                                                                                                      
- Examples:                                                                                                                                                                                                                                                            
-  XnPlot -g xship.grd                       -o mesh.01 (process only grd file)                                                                                                                                                                                        
-  XnPlot -g cc.01.grd -i cc.01 -s sol.00.01 -o sol.01  (solution variables are saved)                                                                                                                                                                                 
-                                                                                                                                                                                                                                                                      
- Notes:                                                                                                                                                                                                                                                               
-   1) the output file name extension is not necessary because it assigned according to the type of output:                                                                                                                                                            
-      binary       Tecplot => .plt                                                                                                                                                                                                                                    
-      ascii        Tecplot => .dat                                                                                                                                                                                                                                    
-      binary/ascii VTK     => .vtm                                                                                                                                                                                                                                    
-   2) if a file name "mb.par" is present into the directory where XnPlot is executed the values of ls                                                                                                                                                                 
-      turbulence model are loaded from this file thus they can be omitted from the command                                                                                                                                                                            
-      line arguments list.                                                                                                                                                                                                                                            
-   3) all the variables other than the nodes coordinates are saved at cell center if "-cell" option is used;                                                                                                                                                          
-      if blanking is used the blanking mode must be "any corners" or "primary values".
++--> XnPlot, post-processor for Xnavis                                                                                                                                                                                                                                
++--> Parsing Command Line Arguments                                                                                                                                                                                                                                   
+|--> The XnPlot Command Line Interface (CLI) has the following options                                                                                                                                                                                                
+|-->   XnPlot  -g value [-o value] [-i value] [-s value] [-ngc] [-cell] [-ls] [-nt] [-eq value] [-vordet] [-ascii] [-tec value] [-vtk value] [-proc value] [-os value] [-vb] [--help] [--version]                                                                     
+|--> Each Command Line Argument (CLA) has the following meaning:                                                                                                                                                                                                      
+|-->   [-g value]                                                                                                                                                                                                                                                     
+|-->     Grid file (.grd)                                                                                                                                                                                                                                             
+|-->     It is a non optional CLA thus must be passed to CLI                                                                                                                                                                                                          
+|-->   [-o value]                                                                                                                                                                                                                                                     
+|-->     output file name; default is basename of grd file with the proper extension                                                                                                                                                                                  
+|-->     It is a optional CLA which default value is "unset"                                                                                                                                                                                                          
+|-->   [-i value]                                                                                                                                                                                                                                                     
+|-->     ICC file                                                                                                                                                                                                                                                     
+|-->     It is a optional CLA which default value is "unset"                                                                                                                                                                                                          
+|-->   [-s value]                                                                                                                                                                                                                                                     
+|-->     solution file name; if passed the solution variables are saved                                                                                                                                                                                               
+|-->     It is a optional CLA which default value is "unset"                                                                                                                                                                                                          
+|-->   [-ngc]                                                                                                                                                                                                                                                         
+|-->     mesh without ghosts cells, as geogrd output                                                                                                                                                                                                                  
+|-->     It is a optional CLA which default value is ".false."                                                                                                                                                                                                        
+|-->   [-cell]                                                                                                                                                                                                                                                        
+|-->     variables other than nodes coord. are cell centered                                                                                                                                                                                                          
+|-->     It is a optional CLA which default value is ".false."
+|-->   [-ls]
+|-->     solution with level set
+|-->     It is a optional CLA which default value is ".false."
+|-->   [-nt]
+|-->     no turbulent model used
+|-->     It is a optional CLA which default value is ".false."
+|-->   [-eq value] with value chosen in: (0,1,2)
+|-->     equations turbulent model
+|-->     It is a optional CLA which default value is "1"
+|-->   [-vordet]
+|-->     computing variables for vortices identification
+|-->     It is a optional CLA which default value is ".false."
+|-->   [-ascii]
+|-->     write ascii output files
+|-->     It is a optional CLA which default value is ".false."
+|-->   [-tec value] with value chosen in: (yes,no)
+|-->     write output Tecplot files
+|-->     It is a optional CLA which default value is "yes"
+|-->   [-vtk value] with value chosen in: (yes,no)
+|-->     write output VTK files
+|-->     It is a optional CLA which default value is "no"
+|-->   [-proc value]
+|-->     process number for global block numeration if proc.input is found
+|-->     It is a optional CLA which default value is "-1"
+|-->   [-os value] with value chosen in: (UIX,WIN)
+|-->     type of Operating System
+|-->     It is a optional CLA which default value is "UIX"
+|-->   [-vb]
+|-->     Verbose output
+|-->     It is a optional CLA which default value is ".false."
+|-->   [--help] or [-h]
+|-->     Print this help message
+|-->     It is a optional CLA
+|-->   [--version] or [-v]
+|-->     Print version
+|-->     It is a optional CLA
+|--> Usage examples:
+|-->   -) XnPlot -g xship.grd -o grid
+|-->   -) XnPlot -g cc.01.grd -i cc.01 -o mesh.01
+|-->   -) XnPlot -g cc.01.grd -i cc.01 -s sol.00.01 -o sol.01
 ```
-
 ### <a name="usage-only-mesh">Post-processing only mesh files
-
 #### GRD files (no ghost cells)
 ```bash
   XnPlot -g xship.grd -o mesh
@@ -185,8 +192,7 @@ A file named `mesh.01.plt` is generated.
   XnPlot -g cc.01.grd -i cc.01 -s sol.00.01 -o sol.01
 ```
 A file named `sol.01.plt` is generated. 
-
-### Utilities
+### <a name="utilities">Utilities
 To be written.
 
 Go to [Top](#top) or [Toc](#toc)

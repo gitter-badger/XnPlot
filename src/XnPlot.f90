@@ -260,9 +260,11 @@ contains
   !---------------------------------------------------------------------------------------------------------------------------------
   write(stdout,'(A)')'+--> XnPlot, post-processor for Xnavis '
   ! initializing CLI
-  call cli%init(progname='XnPlot',                                  &
-                examples=["XnPlot -g xship.grd -o grid",            &
-                          "XnPlot -g cc.01.grd -i cc.01 -o mesh.01",&
+  call cli%init(progname='XnPlot',                                                            &
+                version ='v0.0.2',                                                            &
+                help    =' The XnPlot Command Line Interface (CLI) has the following options',&
+                examples=["XnPlot -g xship.grd -o grid",                                      &
+                          "XnPlot -g cc.01.grd -i cc.01 -o mesh.01",                          &
                           "XnPlot -g cc.01.grd -i cc.01 -s sol.00.01 -o sol.01"])
   ! setting CLAs
   call cli%add(pref='|-->',switch='-g',     help='Grid file (.grd)',required=.true.,act='store',error=error)
@@ -293,7 +295,7 @@ contains
                                             required=.false.,act='store',def='-1',error=error)
   call cli%add(pref='|-->',switch='-os',    help='type of Operating System',&
                                             required=.false.,act='store',def='UIX',choices='UIX,WIN',error=error)
-  call cli%add(pref='|-->',switch='-v',     help='Verbose output',required=.false.,act='store_true',def='.false.',error=error)
+  call cli%add(pref='|-->',switch='-vb',    help='Verbose output',required=.false.,act='store_true',def='.false.',error=error)
   ! parsing CLI
   write(stdout,'(A)')'+--> Parsing Command Line Arguments'
   call cli%parse(error=error,pref='|-->'); if (error/=0) stop

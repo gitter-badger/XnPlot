@@ -48,9 +48,8 @@ help:
 	@echo -e '\033[1;31m  TECIO=yes(no)\033[0m\033[1m => on(off) Tecplot IO library linking (default $(TECIO))\033[0m'
 	@echo
 	@echo -e '\033[1;31m Provided Rules\033[0m'
-	@echo -e '\033[1;31m  Defualt rule     =>\033[0m\033[1m $(DEXE)XnPatches\033[0m'
-	@echo -e '\033[1;31m  help             =>\033[0m\033[1m printing this help message\033[0m'
-	@echo -e '\033[1;31m  $(DEXE)XnPatches =>\033[0m\033[1m building OFF code\033[0m'
+	@echo -e '\033[1;31m  Defualt rule =>\033[0m\033[1m $(DEXE)XnPlot\033[0m'
+	@echo -e '\033[1;31m  help         =>\033[0m\033[1m printing this help message\033[0m'
 	@echo -e '\033[1;31m  cleanobj     =>\033[0m\033[1m cleaning compiled object\033[0m'
 	@echo -e '\033[1;31m  cleanmod     =>\033[0m\033[1m cleaning .mod files\033[0m'
 	@echo -e '\033[1;31m  cleanmsg     =>\033[0m\033[1m cleaning make-log massage files\033[0m'
