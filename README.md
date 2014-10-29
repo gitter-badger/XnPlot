@@ -206,6 +206,9 @@ Go to [Top](#top) or [Toc](#toc)
 
 ## <a name="versions"></a>Version History
 In the following the changelog of most important releases is reported.
+### v0.0.4 
+##### Download [ZIP](https://github.com/szaghi/XnPlot/archive/v0.0.4.zip) ball or [TAR](https://github.com/szaghi/XnPlot/archive/v0.0.4.tar.gz) one
+Fix Bug on compute_vorticity: divide by zero for small volume. VTK disabled.
 ### v0.0.3 
 ##### Download [ZIP](https://github.com/szaghi/XnPlot/archive/v0.0.3.zip) ball or [TAR](https://github.com/szaghi/XnPlot/archive/v0.0.3.tar.gz) one
 Fix Bug on XnPlot-ui: underscores-filled file names works. VTK disabled.

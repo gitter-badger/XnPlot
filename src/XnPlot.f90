@@ -24,8 +24,8 @@
 
 !> @brief XnPlot loads Xnavis mesh and solution files and produces post-processed plot files.
 !> @author    Stefano Zaghi
-!> @version   0.0.3
-!> @date      2014-10-28
+!> @version   0.0.4
+!> @date      2014-10-29
 !> @copyright GNU Public License version 3.
 !> @ingroup XnPlotProgram
 program XnPlot
@@ -34,8 +34,8 @@ USE IR_Precision                                                                
 USE Block_Variables                                                                 ! Block variables definition.
 USE Data_Type_Command_Line_Interface                                                ! Definition of Type_Command_Line_Interface.
 USE Data_Type_PostProcess                                                           ! Definition of Type_PostProcess.
-USE Lib_Metrics                                                                     ! Library for metrics computations.
-USE Lib_Vorticity                                                                   ! Library for vorticity computations.
+!USE Lib_Metrics                                                                     ! Library for metrics computations.
+!USE Lib_Vorticity                                                                   ! Library for vorticity computations.
 USE Lib_TEC                                                                         ! Library for I/O Tecplot files.
 !USE Lib_VTK_IO                                                                      ! Library for I/O VTK files.
 USE, intrinsic:: ISO_FORTRAN_ENV, only: stdout => OUTPUT_UNIT, stderr => ERROR_UNIT ! Standard output/error logical units.

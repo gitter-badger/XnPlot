@@ -91,8 +91,8 @@ BGE_GNU =
 PRF_GNU =
 # Intel
 WRN_INT = -warn all
-CHK_INT = -check all
-DEB_INT = -debug all -extend-source 132 -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -traceback -gen-interfaces
+CHK_INT = -check all -check noarg_temp_created
+DEB_INT = -debug all -extend-source 132 -fpe-all=0 -fp-stack-check -fstack-protector-all -fstack-security-check -ftrapuv -no-ftz -traceback -gen-interfaces
 STD_INT = -std03
 OMP_INT = -openmp
 OPT_INT = -O3 -ipo -inline all -ipo-jobs4 -vec-report1
@@ -127,8 +127,8 @@ ifeq "$(COMPILER)" "intel"
 endif
 ifeq "$(DEBUG)" "yes"
   PREPROC := $(PREPROC) -DDEBUG
-  OPTSC := $(OPTSC) -O0 -C -g $(WRN) $(CHK) $(DEB)
-  OPTSL := $(OPTSL) -O0 -C -g $(WRN) $(CHK) $(DEB)
+  OPTSC := $(OPTSC) -O0 $(WRN) $(CHK) $(DEB) -fno-builtin
+  OPTSL := $(OPTSL) -O0 $(WRN) $(CHK) $(DEB) -fno-builtin
 endif
 ifeq "$(F03STD)" "yes"
   OPTSC := $(OPTSC) $(STD)
@@ -294,26 +294,12 @@ $(DOBJ)lib_io_misc.o : Lib_IO_Misc.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
-$(DOBJ)lib_metrics.o: src/Lib_Metrics.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)block_variables.o \
-	$(DOBJ)data_type_vector.o
-	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
-
 $(DOBJ)lib_tec.o: src/Lib_TEC.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)block_variables.o \
 	$(DOBJ)data_type_postprocess.o \
 	$(DOBJ)data_type_vector.o \
 	$(DOBJ)lib_io_misc.o
-	@echo $(COTEXT) | tee -a make.log
-	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
-
-$(DOBJ)lib_vorticity.o: src/Lib_Vorticity.f90 \
-	$(DOBJ)ir_precision.o \
-	$(DOBJ)block_variables.o \
-	$(DOBJ)data_type_vector.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
@@ -328,9 +314,7 @@ $(DOBJ)xnplot.o : XnPlot.f90 \
 	$(DOBJ)block_variables.o \
 	$(DOBJ)data_type_command_line_interface.o \
 	$(DOBJ)data_type_postprocess.o \
-	$(DOBJ)lib_metrics.o \
 	$(DOBJ)lib_tec.o \
-	$(DOBJ)lib_vorticity.o \
 	$(DOBJ)lib_vtk_io.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
