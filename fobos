@@ -1,0 +1,38 @@
+[modes]
+modes = intel gnu
+
+[intel]
+help            = Compile with Intel ifort
+compiler        = Intel
+cflags          = -cpp -c -O0 -assume realloc_lhs -debug all -traceback -check all -warn all
+preproc         = -D_OSYSTEMuix
+mod_dir         = ./mod/
+obj_dir         = ./obj/
+build_dir       = ./build/
+libs            = ./lib/64bit/libstdc++64.5.0.7.so ./lib/64bit/tecio64.a
+src             = ./src/
+colors          = True
+quiet           = False
+jobs            = 10
+target          = src/XnPlot.f90
+output          = XnPlot
+log             = True
+cflags_heritage = True
+
+[gnu]
+help            = Compile with GNU gfortran
+compiler        = Gnu
+cflags          = -cpp -c -O0 -frealloc-lhs -fcheck=all -fmodule-private -fimplicit-none -fbacktrace -fdump-core -finit-real=nan
+preproc         = -D_OSYSTEMuix
+mod_dir         = ./mod/
+obj_dir         = ./obj/
+build_dir       = ./build/
+libs            = ./lib/64bit/libstdc++64.5.0.7.so ./lib/64bit/tecio64.a
+src             = ./src/
+colors          = True
+quiet           = False
+jobs            = 10
+target          = src/XnPlot.f90
+output          = XnPlot
+log             = True
+cflags_heritage = True

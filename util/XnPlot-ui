@@ -20,6 +20,8 @@ vtk=""
 os=""
 prc=""
 job=1
+vtkmerge=0
+vtkbgroups="unset"
 
 function print_usage {
   echo
@@ -27,7 +29,7 @@ function print_usage {
   echo "User-interface of XnPlot code"
   echo "Usage: `basename $0` [opts [args]]"
   echo "Valid options are all the options of XnPlot code (see XnPlot for the complete list) plus the following:"
-  echo "  [ -l grid_level -n processors_number -f flip_value -u (for unsteady sim) -od output_dir -j #concurrent_jobs]"
+  echo "  [ -l grid_level -n processors_number -f flip_value -u (for unsteady sim) -od output_dir -j #concurrent_jobs -vtkmerge (for merging files into one) -vtkbgroups blocks_groups_file (can be used only with -vtkmerge)]"
   echo
   echo "Defaults of optional arguments:"
   echo "  -l 1"
@@ -36,15 +38,37 @@ function print_usage {
   echo "  steady sim"
   echo "  -od ."
   echo "  -j 1"
+  echo "  -vtkmerge not passed => do not merge files"
+  echo "  -vtkbgroups blocks_groups_file not passed => blocks not grouped"
   echo
   echo "Examples:"
   echo "  XnPlot-ui -g cc -i cc        -o mesh -n 8 (process only mesh)"
   echo "  XnPlot-ui -g cc -i cc -s sol -o sol  -n 8 (solution is saved)"
+  echo "  XnPlot-ui -g cc -i cc -s sol -o sol  -n 8 -vtk yes -vktmerge (merge output vtk files into sol.vtm)"
   echo
-  echo "Note: this user-interface constructs itself the name for cuttered files thus with -g, -i and -s only the base_name"
-  echo "      of files must be provided."
+  echo "Note: this user-interface constructs itself the name for cuttered files thus with -g, -i and -s only the base_name of files must be provided."
   echo
 }
+
+ini_parser ()
+{
+    ini="$(<$1)"                # read the file
+    ini="${ini//[/\[}"          # escape [
+    ini="${ini//]/\]}"          # escape ]
+    IFS=$'\n' && ini=( ${ini} ) # convert to line-array
+    ini=( ${ini[*]//;*/} )      # remove comments with ;
+    ini=( ${ini[*]/\    =/=} )  # remove tabs before =
+    ini=( ${ini[*]/=\   /=} )   # remove tabs be =
+    ini=( ${ini[*]/\ =\ /=} )   # remove anything with a space around =
+    ini=( ${ini[*]/#\\[/\}$'\n'cfg.section.} ) # set section prefix
+    ini=( ${ini[*]/%\\]/ \(} )    # convert text2function (1)
+    ini=( ${ini[*]/=/=\( } )    # convert item to array
+    ini=( ${ini[*]/%/ \)} )     # close array parenthesis
+    ini=( ${ini[*]/%\\ \)/ \\} ) # the multiline trick
+    ini=( ${ini[*]/%\( \)/\(\) \{} ) # convert text2function (2)
+    ini=( ${ini[*]/%\} \)/\}} ) # remove extra parenthesis
+}
+
 if [ $# -eq 0 ] ; then
   print_usage
   exit
@@ -106,6 +130,12 @@ while [ $# -gt 0 ]; do
       ;;
     "-vtk")
       shift; vtk="-vtk "$1
+      ;;
+    "-vtkmerge")
+      vtkmerge=1
+      ;;
+    "-vtkbgroups")
+      shift; vtkbgroups=$1
       ;;
     "-os")
       shift; os="-os "$1
@@ -180,4 +210,55 @@ for p in $( seq 0 1 $npm1 ); do
   let count+=1
   [[ $((count%$job)) -eq 0 ]] && wait
 done
+if [ $vtkmerge -eq 1 ] ; then
+  if [ "$FileOUT" != "unset" ] ; then
+    echo "Generating the VTM merged meta file"
+    echo "<?xml version=\"1.0\"?>" > $outdir$FileOUT.vtm
+    echo "<VTKFile type=\"vtkMultiBlockDataSet\" version=\"1.0\" byte_order=\"LittleEndian\">" >> $outdir$FileOUT.vtm
+    echo "  <vtkMultiBlockDataSet>" >> $outdir$FileOUT.vtm
+    if [ "$vtkbgroups" != "unset" ] ; then
+      ini_parser $vtkbgroups
+      gg=0
+      for g in $( seq 0 2 $((${#ini[@]} - 1)) ); do
+        group=`echo ${ini[$g]} | sed -e 's/\[//g' | sed -e 's/\]//g' | sed -e 's/(//g' | sed -e 's/)//g' | sed -e 's/ //g'`
+        blocks=`echo ${ini[$((g + 1))]} | sed -e 's/blocks=//g' | sed -e 's/(//g' | sed -e 's/)//g'`
+        IFS=' ' read -a blocks <<< "$blocks"
+        echo "    <Block index=\"$gg\" name=\"$group\">" >> $outdir$FileOUT.vtm
+        b=0
+        for block in "${blocks[@]}" ; do
+          bb=`printf "%4.4d" $block`
+          blk="blk_"$bb
+          bfound=""
+          for file in $( ls $outdir$FileOUT*.vtm ); do
+            if [ "$file" != "$outdir$FileOUT.vtm" ] ; then
+              bfound=`grep $blk $file | awk -v bi=$b '{$1=$2=""; print "      <DataSet index=\"" bi+NR-1 "\""$0}'`
+              if [ "$bfound" != "" ] ; then
+                break
+              fi
+            fi
+          done
+          echo $bfound >> $outdir$FileOUT.vtm
+          b=$((b + 1))
+        done
+        echo "    </Block>" >> $outdir$FileOUT.vtm
+        gg=$((gg + 1))
+      done
+    else
+      echo "    <Block index=\"0\">" >> $outdir$FileOUT.vtm
+      b=0
+      for file in $( ls $outdir$FileOUT*.vtm ); do
+        if [ "$file" != "$outdir$FileOUT.vtm" ] ; then
+          grep "<DataSet" $file | awk -v bi=$b '{$1=$2=""; print "      <DataSet index=\"" bi+NR-1 "\""$0}' >> $outdir$FileOUT.vtm
+          l=`grep "<DataSet" $file | wc -l`
+          b=$((b + l))
+        fi
+      done
+      echo "    </Block>" >> $outdir$FileOUT.vtm
+    fi
+    echo "  </vtkMultiBlockDataSet>" >> $outdir$FileOUT.vtm
+    echo "</VTKFile>" >> $outdir$FileOUT.vtm
+  else
+    echo "Error: -vtkmerge can be used only with -o switch!"
+  fi
+fi
 exit 0

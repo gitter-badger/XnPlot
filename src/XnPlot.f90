@@ -34,10 +34,8 @@ USE IR_Precision                                                                
 USE Block_Variables                                                                 ! Block variables definition.
 USE Data_Type_Command_Line_Interface                                                ! Definition of Type_Command_Line_Interface.
 USE Data_Type_PostProcess                                                           ! Definition of Type_PostProcess.
-!USE Lib_Metrics                                                                     ! Library for metrics computations.
-!USE Lib_Vorticity                                                                   ! Library for vorticity computations.
 USE Lib_TEC                                                                         ! Library for I/O Tecplot files.
-!USE Lib_VTK_IO                                                                      ! Library for I/O VTK files.
+USE Lib_VTK                                                                         ! Library for I/O VTK files.
 USE, intrinsic:: ISO_FORTRAN_ENV, only: stdout => OUTPUT_UNIT, stderr => ERROR_UNIT ! Standard output/error logical units.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
@@ -53,18 +51,10 @@ integer(I4P), allocatable:: Ncc(:)            !< Number internal chimera cells f
 integer(I4P)::              i,j,k,b,v         !< Counters.
 real(R8P)::                 t                 !< Solution time.
 integer(I4P)::              error             !< Error trapping flag.
-! misc variables
-!character(100)::          vtkbdir             ! VTK base name of output directory.
-!character(100)::          vtkbfile            ! VTK base name of output files.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------
 call parse_command_arguments(pp=pp)
-
-!if (vtk) then
-!  ! making VTS_files directory
-!  err = make_dir(directory=vtkbdir)
-!endif
 
 ! loading headers
 read(pp%unit_grd)Nb
@@ -225,26 +215,18 @@ do b=1,Nb ! post processing blocks
     endif
   endif
   if (pp%tec) error = file_tec%save_block(pp=pp,b=b,Ni=Ni(b),Nj=Nj(b),Nk=Nk(b))
+  if (pp%vtk) error = file_vtk%save_block(pp=pp,b=b,Ni=Ni(b),Nj=Nj(b),Nk=Nk(b))
 enddo
 
 call pp%finalize()
 if (pp%tec) call file_tec%finalize(pp=pp)
+if (pp%vtk) call file_vtk%finalize(pp=pp,Nb=Nb)
 if (allocated(gc )) deallocate(gc )
 if (allocated(Ni )) deallocate(Ni )
 if (allocated(Nj )) deallocate(Nj )
 if (allocated(Nk )) deallocate(Nk )
 if (allocated(rcc)) deallocate(rcc)
 if (allocated(Ncc)) deallocate(Ncc)
-!if (vtk) then
-!  ! saving the multiblock VTM wrapper
-!  err = VTM_INI_XML(filename=adjustl(trim(File_out))//'.vtm')
-!  err = VTM_BLK_XML(block_action='open')
-!  err = VTM_WRF_XML(flist=(/(adjustl(trim(OS%basename(File_out)))//'-vts_files'//OS%sep//        &
-!                             adjustl(trim(OS%basename(File_out)))//"."//trim(strz(4,b))//'.vts', &
-!                             b=1,Nb)/))
-!  err = VTM_BLK_XML(block_action='close')
-!  err = VTM_END_XML()
-!endif
 stop
 !-----------------------------------------------------------------------------------------------------------------------------------
 contains
@@ -263,8 +245,8 @@ contains
   call cli%init(progname='XnPlot',                                                            &
                 version ='v0.0.2',                                                            &
                 help    =' The XnPlot Command Line Interface (CLI) has the following options',&
-                examples=["XnPlot -g xship.grd -o grid",                                      &
-                          "XnPlot -g cc.01.grd -i cc.01 -o mesh.01",                          &
+                examples=["XnPlot -g xship.grd -o grid                        ",              &
+                          "XnPlot -g cc.01.grd -i cc.01 -o mesh.01            ",              &
                           "XnPlot -g cc.01.grd -i cc.01 -s sol.00.01 -o sol.01"])
   ! setting CLAs
   call cli%add(pref='|-->',switch='-g',     help='Grid file (.grd)',required=.true.,act='store',error=error)
@@ -305,10 +287,7 @@ contains
   call pp%set_from_procinput()
   call pp%input_files_init()
   if (pp%tec) call file_tec%init(pp=pp)
-  !if (vtk) then
-  !  vtkbdir  = adjustl(trim(OS%basedir(File_out)))//adjustl(trim(OS%basename(File_out)))//'-vts_files'//OS%sep
-  !  vtkbfile = adjustl(trim(vtkbdir))//adjustl(trim(OS%basename(File_out)))
-  !endif
+  if (pp%vtk) call file_vtk%init(pp=pp)
               write(stdout,'(A)')'+--> Files'
               write(stdout,'(A)')'|--> GRD File '//trim(pp%File_grd)
   if (pp%fcc) write(stdout,'(A)')'|--> ICC File '//trim(pp%File_icc)

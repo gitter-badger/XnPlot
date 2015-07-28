@@ -5,6 +5,7 @@ USE IR_Precision                     ! Integers and reals precision definition.
 USE Data_Type_Command_Line_Interface ! Definition of Type_Command_Line_Interface.
 USE Data_Type_OS                     ! Definition of Type_OS.
 USE Lib_IO_Misc                      ! Library for miscellanea IO procedures.
+USE Lib_Strings                      ! Library for strings manipulations.
 !-----------------------------------------------------------------------------------------------------------------------------------
 
 !-----------------------------------------------------------------------------------------------------------------------------------

@@ -125,6 +125,7 @@ ifeq "$(COMPILER)" "intel"
   BGE = $(BGE_INT)
   PRF = $(PRF_INT)
 endif
+PREPROC = $(PRF) -D_OSYSTEMuix
 ifeq "$(DEBUG)" "yes"
   PREPROC := $(PREPROC) -DDEBUG
   OPTSC := $(OPTSC) -O0 $(WRN) $(CHK) $(DEB) -fno-builtin
@@ -251,7 +252,8 @@ $(DOBJ)block_variables.o: src/Block_Variables.f90 \
 
 $(DOBJ)data_type_command_line_interface.o: src/Data_Type_Command_Line_Interface.f90 \
 	$(DOBJ)ir_precision.o \
-	$(DOBJ)lib_io_misc.o
+	$(DOBJ)lib_io_misc.o \
+	$(DOBJ)lib_strings.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
@@ -294,12 +296,29 @@ $(DOBJ)lib_io_misc.o : Lib_IO_Misc.f90 \
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
+$(DOBJ)lib_strings.o: ./src/Lib_Strings.f90 \
+	$(DOBJ)ir_precision.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
 $(DOBJ)lib_tec.o: src/Lib_TEC.f90 \
 	$(DOBJ)ir_precision.o \
 	$(DOBJ)block_variables.o \
 	$(DOBJ)data_type_postprocess.o \
+	$(DOBJ)data_type_os.o \
 	$(DOBJ)data_type_vector.o \
 	$(DOBJ)lib_io_misc.o
+	@echo $(COTEXT) | tee -a make.log
+	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
+
+$(DOBJ)lib_vtk.o: ./src/Lib_VTK.f90 \
+	$(DOBJ)ir_precision.o \
+	$(DOBJ)block_variables.o \
+	$(DOBJ)data_type_postprocess.o \
+	$(DOBJ)data_type_vector.o \
+	$(DOBJ)lib_io_misc.o \
+	$(DOBJ)data_type_os.o \
+	$(DOBJ)lib_vtk_io.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 
@@ -315,7 +334,7 @@ $(DOBJ)xnplot.o : XnPlot.f90 \
 	$(DOBJ)data_type_command_line_interface.o \
 	$(DOBJ)data_type_postprocess.o \
 	$(DOBJ)lib_tec.o \
-	$(DOBJ)lib_vtk_io.o
+	$(DOBJ)lib_vtk.o
 	@echo $(COTEXT) | tee -a make.log
 	@$(FC) $(OPTSC) $< -o $@ 1>> diagnostic_messages 2>> error_messages
 

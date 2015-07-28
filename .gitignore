@@ -3,3 +3,5 @@ obj/
 diagnostic_messages
 error_messages
 make.log
+build
+*.log

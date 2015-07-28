@@ -1,0 +1,12 @@
+[submodule "src/Lib_VTK_IO"]
+	path = external/Lib_VTK_IO
+	url = https://github.com/szaghi/Lib_VTK_IO
+[submodule "src/FLAP"]
+	path = external/FLAP
+	url = https://github.com/szaghi/FLAP
+[submodule "external/IR_Precision"]
+	path = external/IR_Precision
+	url = https://github.com/szaghi/IR_Precision
+[submodule "external/BeFoR64"]
+	path = external/BeFoR64
+	url = https://github.com/szaghi/BeFoR64
