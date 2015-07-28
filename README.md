@@ -4,6 +4,8 @@
 
 # XnPlot
 ### <a name="top">Xnavis PostProcessor
+
+[![Join the chat at https://gitter.im/szaghi/XnPlot](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/szaghi/XnPlot?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 XnPlot loads Xnavis mesh and solution files and produces post-processed plot files.
 
 ## <a name="toc">Table of Contents
